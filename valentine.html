@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Will You Be My Valentine?</title>
+<style>
+  :root{
+    --blush:#fff1ee;
+    --rose:#ff5d7a;
+    --rose-deep:#e23d5b;
+    --plum:#5a2a3a;
+    --cream:#fffaf6;
+    --gold:#ffb84d;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:'Trebuchet MS', 'Segoe UI', sans-serif;
+    background:var(--blush);
+  }
+
+  /* floating heart background */
+  #heartfield{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .bg-heart{
+    position:absolute;
+    bottom:-10%;
+    font-size:28px;
+    opacity:0.35;
+    animation:rise linear infinite;
+    color:var(--rose);
+  }
+  @keyframes rise{
+    0%{ transform:translateY(0) rotate(0deg); opacity:0; }
+    10%{ opacity:0.35; }
+    90%{ opacity:0.35; }
+    100%{ transform:translateY(-115vh) rotate(25deg); opacity:0; }
+  }
+
+  .screen{
+    position:relative;
+    z-index:1;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:24px;
+    overflow-y:auto;
+  }
+
+  .hidden{ display:none !important; }
+
+  /* ---------- ASK SCREEN ---------- */
+  .card{
+    background:var(--cream);
+    border-radius:28px;
+    padding:40px 28px 36px;
+    max-width:420px;
+    width:100%;
+    box-shadow:0 20px 50px rgba(226,61,91,0.25), 0 0 0 6px rgba(255,184,77,0.15);
+    position:relative;
+  }
+
+  .big-heart{
+    font-size:54px;
+    display:inline-block;
+    animation:beat 1.2s ease-in-out infinite;
+    margin-bottom:6px;
+  }
+  @keyframes beat{
+    0%,100%{ transform:scale(1); }
+    25%{ transform:scale(1.12); }
+    40%{ transform:scale(0.96); }
+    60%{ transform:scale(1.08); }
+  }
+
+  h1{
+    font-family:'Brush Script MT', cursive;
+    font-size:44px;
+    color:var(--rose-deep);
+    margin:10px 0 4px;
+    line-height:1.15;
+  }
+
+  .subtitle{
+    font-size:16px;
+    color:var(--plum);
+    opacity:0.75;
+    margin:0 0 30px;
+  }
+
+  .buttons{
+    display:flex;
+    gap:18px;
+    justify-content:center;
+    position:relative;
+    min-height:64px;
+  }
+
+  button{
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:700;
+    border-radius:999px;
+    padding:16px 30px;
+    font-size:18px;
+    transition:transform .15s ease, box-shadow .15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  #yesBtn{
+    background:linear-gradient(135deg,var(--rose),var(--rose-deep));
+    color:#fff;
+    box-shadow:0 10px 24px rgba(226,61,91,0.4);
+  }
+  #yesBtn:active{ transform:scale(0.94); }
+
+  #noBtn{
+    background:#fff;
+    color:var(--plum);
+    border:2px solid #e8d9d0;
+    position:relative;
+    z-index:2;
+  }
+
+  /* No button escapes via fixed positioning once it starts roaming */
+  #noBtn.roaming{
+    position:fixed;
+    transition:top .18s ease, left .18s ease;
+  }
+
+  .hint{
+    margin-top:18px;
+    font-size:12.5px;
+    color:var(--plum);
+    opacity:0.5;
+  }
+
+  /* ---------- YAY SCREEN ---------- */
+  #yayScreen{
+    background:#000;
+    overflow-y:auto;
+    padding:40px 20px 60px;
+    height:100%;
+    justify-content:flex-start;
+  }
+  #yayScreen h2{
+    font-family:'Brush Script MT', cursive;
+    font-size:64px;
+    color:#fff;
+    text-shadow:0 6px 18px rgba(255,255,255,0.15);
+    margin:10px 0 0;
+  }
+  #yayScreen .meow{
+    font-size:24px;
+    color:#fff;
+    margin-top:6px;
+    font-weight:700;
+    letter-spacing:0.5px;
+  }
+  .cat{
+    font-size:90px;
+    margin-top:10px;
+    margin-bottom:30px;
+    animation:wiggle 1.6s ease-in-out infinite;
+  }
+  @keyframes wiggle{
+    0%,100%{ transform:rotate(-4deg); }
+    50%{ transform:rotate(4deg); }
+  }
+
+  .gallery{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    justify-content:center;
+    max-width:900px;
+    width:100%;
+  }
+  .gallery figure{
+    margin:0;
+    width:260px;
+    max-width:42vw;
+    flex:1 1 260px;
+  }
+  .gallery img{
+    width:100%;
+    height:260px;
+    object-fit:cover;
+    display:block;
+    border-radius:18px;
+    border:3px solid #ff8fab;
+    box-shadow:0 12px 30px rgba(255,93,122,0.35);
+    background:#1a1a1a;
+  }
+  .photo-box{
+    width:100%;
+    height:260px;
+    border-radius:18px;
+    border:3px solid #ff8fab;
+    box-shadow:0 12px 30px rgba(255,93,122,0.35);
+    background:linear-gradient(135deg,#2a1a1f,#1a1a1a);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:48px;
+    overflow:hidden;
+  }
+  .photo-box img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    border:none;
+    box-shadow:none;
+    border-radius:0;
+  }
+  .photo-box.img-missing img{ display:none; }
+  .gallery figcaption{
+    color:#f4d8df;
+    font-size:13px;
+    margin-top:8px;
+    opacity:0.7;
+  }
+
+  @media (max-width:600px){
+    .gallery figure{
+      max-width:90vw;
+      flex:1 1 90vw;
+    }
+  }
+
+  .confetti-emoji{
+    position:fixed;
+    top:-40px;
+    font-size:22px;
+    animation:fall linear forwards;
+    z-index:5;
+  }
+  @keyframes fall{
+    to{ transform:translateY(110vh) rotate(360deg); opacity:0.9; }
+  }
+</style>
+</head>
+<body>
+
+<div id="heartfield"></div>
+
+<!-- ASK SCREEN -->
+<div class="screen" id="askScreen">
+  <div class="card">
+    <div class="big-heart">💘</div>
+    <h1>Will you be<br>my Valentine?</h1>
+    <div class="buttons">
+      <button id="yesBtn">Yes!</button>
+      <button id="noBtn">No</button>
+    </div>
+    <p class="hint">(psst — try pressing "no")</p>
+  </div>
+</div>
+
+<!-- YAY SCREEN -->
+<div class="screen hidden" id="yayScreen">
+  <h2>Yay!!</h2>
+  <div class="meow">meow 🐾</div>
+  <div class="cat">😻</div>
+
+  <div class="gallery">
+    <figure>
+      <div class="photo-box" id="box1">
+        <img src="photo1.jpg" alt="Us, photo 1" onerror="document.getElementById('box1').classList.add('img-missing'); document.getElementById('box1').innerHTML='🤍';">
+      </div>
+      <figcaption>📷 replace photo1.jpg with your photo</figcaption>
+    </figure>
+    <figure>
+      <div class="photo-box" id="box2">
+        <img src="photo2.jpg" alt="Us, photo 2" onerror="document.getElementById('box2').classList.add('img-missing'); document.getElementById('box2').innerHTML='🤍';">
+      </div>
+      <figcaption>📷 replace photo2.jpg with your photo</figcaption>
+    </figure>
+    <figure>
+      <div class="photo-box" id="box3">
+        <img src="photo3.jpg" alt="Us, photo 3" onerror="document.getElementById('box3').classList.add('img-missing'); document.getElementById('box3').innerHTML='🤍';">
+      </div>
+      <figcaption>📷 replace photo3.jpg with your photo</figcaption>
+    </figure>
+  </div>
+</div>
+
+<script>
+  // ----- ambient floating hearts -----
+  const heartfield = document.getElementById('heartfield');
+  const heartChars = ['💗','💖','💕','💞','❤️'];
+  for(let i=0;i<16;i++){
+    const h = document.createElement('div');
+    h.className = 'bg-heart';
+    h.textContent = heartChars[Math.floor(Math.random()*heartChars.length)];
+    h.style.left = Math.random()*100 + '%';
+    h.style.fontSize = (18 + Math.random()*26) + 'px';
+    h.style.animationDuration = (6 + Math.random()*8) + 's';
+    h.style.animationDelay = (Math.random()*8) + 's';
+    heartfield.appendChild(h);
+  }
+
+  // ----- elements -----
+  const askScreen = document.getElementById('askScreen');
+  const yayScreen = document.getElementById('yayScreen');
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn = document.getElementById('noBtn');
+
+  let dodgeCount = 0;
+  const noPhrases = [
+    'No', 'Nope!', "Catch me!", 'Try again', "Nu-uh", "Nice try", "Missed me", "Almost!", "Pick yes 🥺"
+  ];
+
+  function moveNoButton(){
+    // make it position:fixed and roaming so it can go anywhere in the viewport
+    noBtn.classList.add('roaming');
+
+    const margin = 16;
+    const btnW = noBtn.offsetWidth || 100;
+    const btnH = noBtn.offsetHeight || 50;
+
+    const maxX = window.innerWidth - btnW - margin;
+    const maxY = window.innerHeight - btnH - margin;
+
+    const newX = Math.max(margin, Math.random() * maxX);
+    const newY = Math.max(margin, Math.random() * maxY);
+
+    noBtn.style.left = newX + 'px';
+    noBtn.style.top = newY + 'px';
+
+    dodgeCount++;
+    noBtn.textContent = noPhrases[Math.min(dodgeCount, noPhrases.length - 1)];
+
+    // shrink the yes-doubt slightly and grow the yes button each time, just for fun
+    yesBtn.style.transform = 'scale(' + Math.min(1 + dodgeCount * 0.04, 1.4) + ')';
+  }
+
+  // Every click or tap on "No" teleports it somewhere else on screen.
+  noBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    moveNoButton();
+  });
+
+  noBtn.addEventListener('touchend', function(e){
+    e.preventDefault();
+    moveNoButton();
+  });
+
+  function showYay(){
+    askScreen.classList.add('hidden');
+    yayScreen.classList.remove('hidden');
+    launchConfetti();
+  }
+
+  yesBtn.addEventListener('click', showYay);
+  yesBtn.addEventListener('touchend', function(e){
+    e.preventDefault();
+    showYay();
+  });
+
+  function launchConfetti(){
+    const emojis = ['🎉','💖','✨','🐾','💗','🌸'];
+    for(let i=0;i<28;i++){
+      const c = document.createElement('div');
+      c.className = 'confetti-emoji';
+      c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      c.style.left = Math.random()*100 + '%';
+      c.style.animationDuration = (2.5 + Math.random()*2) + 's';
+      c.style.animationDelay = (Math.random()*1.2) + 's';
+      yayScreen.appendChild(c);
+      setTimeout(()=>c.remove(), 5500);
+    }
+  }
+
+  // keep the no button inside viewport on resize/orientation change
+  window.addEventListener('resize', function(){
+    if(noBtn.classList.contains('roaming')){
+      moveNoButton();
+    }
+  });
+</script>
+
+</body>
+</html>
